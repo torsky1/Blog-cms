@@ -1,0 +1,1 @@
+web: gunicorn blogcms.wsgi:application 
