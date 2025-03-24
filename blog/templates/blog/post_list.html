@@ -4,6 +4,103 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Blog - Lista postów</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        color: #333;
+      }
+      header {
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #eee;
+      }
+      h1 {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 2.5em;
+      }
+      .posts {
+        display: grid;
+        gap: 30px;
+      }
+      .post {
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 25px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .post:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .post h2 {
+        margin: 0 0 15px 0;
+        font-size: 1.8em;
+      }
+      .post h2 a {
+        color: #2c3e50;
+        text-decoration: none;
+      }
+      .post h2 a:hover {
+        color: #4caf50;
+      }
+      .post-meta {
+        color: #666;
+        font-size: 0.9em;
+        margin-bottom: 15px;
+      }
+      .post-content {
+        color: #444;
+        line-height: 1.8;
+      }
+      .post-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        margin-bottom: 20px;
+      }
+      .empty-message {
+        text-align: center;
+        padding: 40px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        color: #666;
+      }
+      .new-post-button {
+        display: inline-block;
+        background-color: #2c3e50);
+        color: white;
+        padding: 12px 25px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-bottom: 30px;
+        transition: background-color 0.2s;
+        font-weight: bold;
+        text-align: center;
+      }
+      .new-post-button:hover {
+        background-color: #45a049;
+        color: white;
+      }
+      .user-actions {
+        margin-top: 20px;
+        text-align: right;
+      }
+      .user-actions a {
+        color: #4caf50;
+        text-decoration: none;
+        margin-left: 15px;
+      }
+      .user-actions a:hover {
+        text-decoration: underline;
+      }
+    </style>
   </head>
   <body>
     <header>
@@ -11,12 +108,32 @@
     </header>
 
     <main>
-      {% if posts %}
+      {% if user.is_authenticated %}
+      <div class="user-actions">
+        <a href="{% url 'blog:post_new' %}" class="new-post-button">
+          Dodaj nowy post
+        </a>
+        <a href="{% url 'users:dashboard' %}">Panel użytkownika</a>
+        <a href="{% url 'users:logout' %}">Wyloguj się</a>
+      </div>
+      {% else %}
+      <div class="user-actions">
+        <a href="{% url 'users:login' %}">Zaloguj się</a>
+        <a href="{% url 'users:register' %}">Zarejestruj się</a>
+      </div>
+      {% endif %} {% if posts %}
       <div class="posts">
         {% for post in posts %}
         <article class="post">
+          {% if post.image %}
+          <img
+            src="{{ post.image.url }}"
+            alt="{{ post.title }}"
+            class="post-image"
+          />
+          {% endif %}
           <h2>
-            <a href="{% url 'blog:post_detail' post.slug %}">
+            <a href="{% url 'blog:post_detail' slug=post.slug %}">
               {{ post.title }}
             </a>
           </h2>
@@ -24,15 +141,17 @@
             <time datetime="{{ post.created_at|date:'Y-m-d' }}">
               {{ post.created_at|date:'d.m.Y' }}
             </time>
-            | Autor: {{ post.author.get_full_name|default:post.author.username
-            }}
+            | Autor: {% with full_name=post.author.get_full_name %} {{
+            full_name|default:post.author.username }} {% endwith %}
           </div>
           <div class="post-content">{{ post.content|truncatewords:50 }}</div>
         </article>
         {% endfor %}
       </div>
       {% else %}
-      <p>Brak postów do wyświetlenia.</p>
+      <div class="empty-message">
+        <p>Brak postów do wyświetlenia.</p>
+      </div>
       {% endif %}
     </main>
   </body>

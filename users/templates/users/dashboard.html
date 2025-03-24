@@ -1,56 +1,109 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="pl">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Panel użytkownika - Blog</title>
+    <title>Panel użytkownika</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .user-info {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 4px;
+        margin-bottom: 30px;
+      }
+      .posts {
+        display: grid;
+        gap: 20px;
+      }
+      .post {
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .post h3 {
+        margin-top: 0;
+        color: #333;
+      }
+      .post-meta {
+        color: #666;
+        font-size: 0.9em;
+        margin-bottom: 10px;
+      }
+      .post-actions {
+        margin-top: 15px;
+      }
+      .post-actions a {
+        color: #4caf50;
+        text-decoration: none;
+        margin-right: 15px;
+      }
+      .post-actions a:hover {
+        text-decoration: underline;
+      }
+      .button {
+        display: inline-block;
+        background-color: #2c3e50;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-top: 20px;
+        font-weight: bold;
+      }
+      .button:hover {
+        background-color: #34495e;
+      }
+      .logout-link {
+        margin-top: 20px;
+        text-align: right;
+      }
+      .logout-link a {
+        color: #dc3545;
+        text-decoration: none;
+      }
+      .logout-link a:hover {
+        text-decoration: underline;
+      }
+    </style>
   </head>
   <body>
-    <h1>Panel użytkownika</h1>
-
     <div class="user-info">
+      <h1>Panel użytkownika</h1>
       <h2>Witaj, {{ user.get_full_name|default:user.username }}!</h2>
-      <p>Email: {{ user.email }}</p>
-      <p><a href="{% url 'users:logout' %}">Wyloguj się</a></p>
     </div>
 
-    <div class="user-posts">
-      <h2>Twoje posty</h2>
-      {% if posts %}
-      <div class="posts">
-        {% for post in posts %}
-        <article class="post">
-          <h3>
-            <a href="{% url 'blog:post_detail' post.slug %}">
-              {{ post.title }}
-            </a>
-          </h3>
-          <div class="post-meta">
-            <time datetime="{{ post.created_at|date:'Y-m-d' }}">
-              {{ post.created_at|date:'d.m.Y' }}
-            </time>
-            | Status: {% if post.published %}Opublikowany{% else %}Szkic{% endif
-            %}
-          </div>
-          <div class="post-actions">
-            <a href="{% url 'blog:post_edit' post.slug %}">Edytuj</a>
-          </div>
-        </article>
-        {% endfor %}
+    <h2>Twoje posty</h2>
+    {% if posts %}
+    <div class="posts">
+      {% for post in posts %}
+      <div class="post">
+        <h3>{{ post.title }}</h3>
+        <div class="post-meta">
+          <p>Data: {{ post.created_at|date:"d.m.Y" }}</p>
+          <p>Status: {{ post.published|yesno:"Opublikowany,Szkic" }}</p>
+        </div>
+        <div class="post-actions">
+          <a href="{% url 'blog:post_edit' slug=post.slug %}">Edytuj post</a>
+          <a href="{% url 'blog:post_detail' slug=post.slug %}">Zobacz post</a>
+        </div>
       </div>
-      {% else %}
-      <p>Nie masz jeszcze żadnych postów.</p>
-      {% endif %}
-
-      <p>
-        <a href="{% url 'blog:post_create' %}" class="button"
-          >Dodaj nowy post</a
-        >
-      </p>
+      {% endfor %}
     </div>
+    {% else %}
+    <p>Nie masz jeszcze żadnych postów.</p>
+    {% endif %}
 
-    <p>
-      <a href="{% url 'blog:post_list' %}">Powrót do strony głównej</a>
-    </p>
+    <a href="{% url 'blog:post_new' %}" class="button">Dodaj nowy post</a>
+
+    <div class="logout-link">
+      <a href="{% url 'users:logout' %}">Wyloguj się</a>
+    </div>
   </body>
 </html>

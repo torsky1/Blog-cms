@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% if post %}Edytuj post{% else %}Nowy post{% endif %}</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        color: #333;
+        line-height: 1.6;
+      }
+      h1 {
+        color: #2c3e50;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #eee;
+      }
+      form {
+        background-color: #f8f9fa;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1em;
+        transition: border-color 0.2s;
+      }
+      input[type="text"]:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #4caf50;
+        box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+      }
+      textarea {
+        height: 300px;
+        resize: vertical;
+      }
+      input[type="file"] {
+        margin-top: 5px;
+        padding: 10px;
+        background-color: white;
+        border: 1px dashed #ddd;
+        border-radius: 4px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .checkbox-group input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+      }
+      .checkbox-group label {
+        margin: 0;
+        font-weight: normal;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.2s;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #666;
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+      }
+      .back-link:hover {
+        background-color: #f8f9fa;
+        text-decoration: none;
+      }
+      .error-message {
+        color: #dc3545;
+        font-size: 0.9em;
+        margin-top: 5px;
+      }
+      .help-text {
+        color: #666;
+        font-size: 0.9em;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>{% if post %}Edytuj post{% else %}Nowy post{% endif %}</h1>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="{{ form.title.id_for_label }}">Tytuł:</label>
+        {{ form.title }} {% if form.title.errors %}
+        <div class="error-message">{{ form.title.errors }}</div>
+        {% endif %} {% if form.title.help_text %}
+        <div class="help-text">{{ form.title.help_text }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.content.id_for_label }}">Treść:</label>
+        {{ form.content }} {% if form.content.errors %}
+        <div class="error-message">{{ form.content.errors }}</div>
+        {% endif %} {% if form.content.help_text %}
+        <div class="help-text">{{ form.content.help_text }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.image.id_for_label }}">Obraz (opcjonalnie):</label>
+        {{ form.image }} {% if form.image.errors %}
+        <div class="error-message">{{ form.image.errors }}</div>
+        {% endif %} {% if form.image.help_text %}
+        <div class="help-text">{{ form.image.help_text }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <div class="checkbox-group">
+          {{ form.published }}
+          <label for="{{ form.published.id_for_label }}">Opublikowany</label>
+        </div>
+        {% if form.published.errors %}
+        <div class="error-message">{{ form.published.errors }}</div>
+        {% endif %} {% if form.published.help_text %}
+        <div class="help-text">{{ form.published.help_text }}</div>
+        {% endif %}
+      </div>
+
+      <button type="submit">
+        {% if post %}Zapisz zmiany{% else %}Utwórz post{% endif %}
+      </button>
+    </form>
+
+    <a href="{% url 'users:dashboard' %}" class="back-link"
+      >← Powrót do panelu użytkownika</a
+    >
+  </body>
+</html>

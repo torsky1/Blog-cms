@@ -14,7 +14,13 @@ def post_list(request):
     return render(request, 'blog/post_list.html', {'posts': posts})
 
 def post_detail(request, slug):
-    post = get_object_or_404(Post, slug=slug, published=True)
+    post = get_object_or_404(Post, slug=slug)
+    
+    # Sprawdź czy użytkownik jest autorem postu lub czy post jest opublikowany
+    if not post.published and post.author != request.user:
+        messages.error(request, 'Ten post nie jest jeszcze opublikowany.')
+        return redirect('blog:post_list')
+        
     comments = post.comments.all()
     new_comment = None
 
@@ -54,6 +60,24 @@ def post_create(request):
     return render(request, 'blog/post_form.html', {
         'form': form,
         'title': 'Nowy post'
+    })
+
+@login_required
+def post_edit(request, slug):
+    post = get_object_or_404(Post, slug=slug, author=request.user)
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            messages.success(request, 'Post został zaktualizowany.')
+            return redirect('blog:post_detail', slug=post.slug)
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'blog/post_form.html', {
+        'form': form,
+        'post': post
     })
 
 class PostListAPI(generics.ListCreateAPIView):
